@@ -7,8 +7,8 @@ return {
         { 'MunifTanjim/nui.nvim' }
     },
     keys = {
-      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
-      { "<leader>o", "<cmd>Neotree focus<cr>", desc = "NeoTree" },
+        { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "NeoTree" },
+        { "<leader>o", "<cmd>Neotree focus<cr>",  desc = "NeoTree" },
     },
     config = function()
         -- Unless you are still migrating, remove the deprecated commands from v1.x
@@ -16,13 +16,13 @@ return {
 
         -- If you want icons for diagnostic errors, you'll need to define them somewhere:
         vim.fn.sign_define("DiagnosticSignError",
-            { text = " ", texthl = "DiagnosticSignError" })
+            { text = "e ", texthl = "DiagnosticSignError" })
         vim.fn.sign_define("DiagnosticSignWarn",
-            { text = " ", texthl = "DiagnosticSignWarn" })
+            { text = "w ", texthl = "DiagnosticSignWarn" })
         vim.fn.sign_define("DiagnosticSignInfo",
-            { text = " ", texthl = "DiagnosticSignInfo" })
+            { text = "i ", texthl = "DiagnosticSignInfo" })
         vim.fn.sign_define("DiagnosticSignHint",
-            { text = "", texthl = "DiagnosticSignHint" })
+            { text = "h", texthl = "DiagnosticSignHint" })
         -- NOTE: this is changed from v1.x, which used the old style of highlight groups
         -- in the form "LspDiagnosticsSignWarning"
 
@@ -32,8 +32,8 @@ return {
             enable_git_status = true,
             enable_diagnostics = true,
             open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
-            sort_case_insensitive = false,                             -- used when sorting files and directories in the tree
-            sort_function = nil,                                       -- use a custom function for sorting files and directories in the tree
+            sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
+            sort_function = nil,                                               -- use a custom function for sorting files and directories in the tree
             -- sort_function = function (a,b)
             --       if a.type == b.type then
             --           return a.path > b.path
@@ -41,6 +41,16 @@ return {
             --           return a.type > b.type
             --       end
             --   end , -- this sorts files and directories descendantly
+
+            -- hide default statusline
+            event_handlers = {
+                {
+                    event = "neo_tree_buffer_enter",
+                    handler = function()
+                        vim.o.laststatus = 0
+                    end
+                }
+            },
             default_component_configs = {
                 container = {
                     enable_character_fade = true
@@ -80,16 +90,16 @@ return {
                 git_status = {
                     symbols = {
                         -- Change type
-                        added     = "", -- or "✚", but this is redundant info if you use git_status_colors on the name
-                        modified  = "", -- or "", but this is redundant info if you use git_status_colors on the name
+                        added     = "A", -- or "✚", but this is redundant info if you use git_status_colors on the name
+                        modified  = "M", -- or "", but this is redundant info if you use git_status_colors on the name
                         deleted   = "✖", -- this can only be used in the git_status source
-                        renamed   = "", -- this can only be used in the git_status source
+                        renamed   = "R", -- this can only be used in the git_status source
                         -- Status type
-                        untracked = "",
-                        ignored   = "",
-                        unstaged  = "",
-                        staged    = "",
-                        conflict  = "",
+                        untracked = "u",
+                        ignored   = "I",
+                        unstaged  = "U",
+                        staged    = "S",
+                        conflict  = "C",
                     }
                 },
             },
@@ -99,7 +109,7 @@ return {
             commands = {},
             window = {
                 position = "left",
-                width = 40,
+                width = 35,
                 mapping_options = {
                     noremap = true,
                     nowait = true,
@@ -109,7 +119,8 @@ return {
                         "toggle_node",
                         nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
                     },
-                    ["<2-LeftMouse>"] = "open",
+                    -- ["<2-LeftMouse>"] = "open",
+                    ["<leftrelease>"] = "open",
                     ["<cr>"] = "open",
                     ["<esc>"] = "revert_preview",
                     ["P"] = { "toggle_preview", config = { use_float = true } },
@@ -181,9 +192,9 @@ return {
                         --".null-ls_*",
                     },
                 },
-                follow_current_file = false,    -- This will find and focus the file in the active buffer every
+                follow_current_file = false,            -- This will find and focus the file in the active buffer every
                 -- time the current file is changed while the tree is open.
-                group_empty_dirs = false,       -- when true, empty folders will be grouped together
+                group_empty_dirs = false,               -- when true, empty folders will be grouped together
                 hijack_netrw_behavior = "open_default", -- netrw disabled, opening a directory opens neo-tree
                 -- in whatever position is specified in window.position
                 -- "open_current",  -- netrw disabled, opening a directory opens within the
@@ -214,12 +225,40 @@ return {
                     },
                 },
 
-                commands = {} -- Add a custom command or override a global one using the same function name
+                commands = {}, -- Add a custom command or override a global one using the same function name
+                components = {
+                    icon = function(config, node, state)
+                        local icon = config.default or "F"
+                        local padding = config.padding or " "
+                        local highlight = config.highlight -- or highlights.FILE_ICON
+
+                        if node.type == "directory" then
+                            -- highlight = highlights.DIRECTORY_ICON
+                            if node:is_expanded() then
+                                icon = config.folder_open or "-"
+                            else
+                                icon = config.folder_closed or "+"
+                            end
+                            -- elseif node.type == "file" then
+                            --     -- local success, web_devicons = pcall(require, "nvim-web-devicons")
+                            --     -- if success then
+                            --     --     local devicon, hl = web_devicons.get_icon(node.name, node.ext)
+                            --     --     icon = devicon or icon
+                            --     --     highlight = hl or highlight
+                            --     -- end
+                        end
+
+                        return {
+                            text = icon .. padding,
+                            highlight = highlight,
+                        }
+                    end,
+                }
             },
             buffers = {
                 follow_current_file = true, -- This will find and focus the file in the active buffer every
                 -- time the current file is changed while the tree is open.
-                group_empty_dirs = true, -- when true, empty folders will be grouped together
+                group_empty_dirs = true,    -- when true, empty folders will be grouped together
                 show_unloaded = true,
                 window = {
                     mappings = {

@@ -21,7 +21,9 @@ local plugins = {
   require('plugins.telescope'),
   require('plugins.tokyonight'),
   require('plugins.nvim-cmp'),
-  require('plugins.lsp.nvim-lspconfig')
+  require('plugins.lsp.nvim-lspconfig'),
+  require('plugins.which-key'),
+  require('plugins.nvim-treesitter')
   -- 'L3MON4D3/LuaSnip',
   -- 'saadparwaiz1/cmp_luasnip',
   -- 'rafamadriz/friendly-snippets',
