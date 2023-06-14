@@ -1,7 +1,7 @@
 local options = {
     number = true,
     relativenumber = true,
-    paste = true,
+    -- paste = true, -- set true will effect nvim-cmp enter completion
     shiftwidth = 4,
     tabstop = 4,
     softtabstop = 4,

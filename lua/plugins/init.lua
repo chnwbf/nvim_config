@@ -24,7 +24,9 @@ local plugins = {
   require('plugins.lsp.nvim-lspconfig'),
   require('plugins.which-key'),
   require('plugins.nvim-treesitter'),
-  require('plugins.comment')
+  require('plugins.comment'),
+  require('plugins.nvim-surround'),
+  require('plugins.nvim-autopairs'),
   -- 'L3MON4D3/LuaSnip',
   -- 'saadparwaiz1/cmp_luasnip',
   -- 'rafamadriz/friendly-snippets',
